@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/catatan_store.dart';
 import 'detail_catatan_screen.dart';
-// Import FormScreen untuk tombol back
 import 'form_screen.dart';
 
 class DaftarCatatanScreen extends StatefulWidget {
@@ -15,32 +14,17 @@ class DaftarCatatanScreen extends StatefulWidget {
 class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
   String _searchQuery = '';
 
-  // Data Info Mata Kuliah (Dikembalikan seperti aslimu)
   final Map<String, Map<String, String>> mataKuliahInfo = {
-    'Sistem Manajemen Basis Data': {
-      'dosen': 'FAHRUL HIDAYAT S.Kom., M.Kom',
-    },
-    'Teknologi Aplikasi Bergerak': {
-      'dosen': 'ISTIA BUDI S.Kom M.Kom',
-    },
-    'Penalaran Komputer': {
-      'dosen': 'SLAMET HARTONO S.Kom., M.Kom',
-    },
-    'Simulasi dan Game Komputer': {
-      'dosen': 'ISTIA BUDI S.Kom M.Kom',
-    },
-    'Kriptografi': {
-      'dosen': 'WISNU HERA P S.TP., M.Eng',
-    },
+    'Sistem Manajemen Basis Data': {'dosen': 'FAHRUL HIDAYAT S.Kom., M.Kom'},
+    'Teknologi Aplikasi Bergerak': {'dosen': 'ISTIA BUDI S.Kom M.Kom'},
+    'Penalaran Komputer': {'dosen': 'SLAMET HARTONO S.Kom., M.Kom'},
+    'Simulasi dan Game Komputer': {'dosen': 'ISTIA BUDI S.Kom M.Kom'},
+    'Kriptografi': {'dosen': 'WISNU HERA P S.TP., M.Eng'},
     'Penulisan dan Publikasi Ilmiah': {
-      'dosen': 'Prof. Dr. Ir. SULARDIONO, M.S.',
+      'dosen': 'Prof. Dr. Ir. SULARDIONO, M.S.'
     },
-    'Jaringan Nirkabel': {
-      'dosen': 'FANNY RAMADHANI S.Kom., M.Kom',
-    },
-    'Pemrograman Aplikasi Bergerak': {
-      'dosen': 'GUNAWAN S.ST., M.T',
-    },
+    'Jaringan Nirkabel': {'dosen': 'FANNY RAMADHANI S.Kom., M.Kom'},
+    'Pemrograman Aplikasi Bergerak': {'dosen': 'GUNAWAN S.ST., M.T'},
   };
 
   @override
@@ -54,12 +38,10 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
         iconTheme: const IconThemeData(color: Color(0xFF37352F)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const FormScreen()),
-            );
-          },
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const FormScreen()),
+          ),
         ),
         title: const Text('Daftar Catatan',
             style: TextStyle(
@@ -108,7 +90,7 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
             itemBuilder: (context, index) {
               final catatan = filteredList[index];
               final info = mataKuliahInfo[catatan.mataKuliah];
-              return _buildCatatanCard(context, store, catatan, info);
+              return _buildCatatanCard(context, catatan, info);
             },
           );
         },
@@ -116,8 +98,8 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
     );
   }
 
-  Widget _buildCatatanCard(BuildContext context, CatatanStore store,
-      CatatanModel catatan, Map<String, String>? info) {
+  Widget _buildCatatanCard(
+      BuildContext context, CatatanModel catatan, Map<String, String>? info) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 16),
@@ -168,10 +150,9 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
                     const Icon(Icons.person_outline,
                         size: 14, color: Colors.grey),
                     const SizedBox(width: 6),
-                    Text(
-                      info?['dosen'] ?? 'Dosen Belum Diatur',
-                      style: const TextStyle(fontSize: 13, color: Colors.grey),
-                    ),
+                    Text(info?['dosen'] ?? 'Dosen Belum Diatur',
+                        style:
+                            const TextStyle(fontSize: 13, color: Colors.grey)),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -197,10 +178,12 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
                 TextButton(
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                DetailCatatanScreen(catatan: catatan)));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            DetailCatatanScreen(catatan: catatan),
+                      ),
+                    );
                   },
                   child: const Text('BUKA CATATAN',
                       style: TextStyle(
@@ -211,7 +194,7 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
                 IconButton(
                   icon: const Icon(Icons.delete_outline,
                       color: Colors.redAccent, size: 20),
-                  onPressed: () => _konfirmasiHapus(context, store, catatan.id),
+                  onPressed: () => _konfirmasiHapus(context, catatan.id),
                 ),
               ],
             ),
@@ -221,7 +204,7 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
     );
   }
 
-  void _konfirmasiHapus(BuildContext context, CatatanStore store, String id) {
+  void _konfirmasiHapus(BuildContext context, String id) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -237,7 +220,8 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () {
-              store.hapusCatatan(id);
+              Provider.of<CatatanStore>(context, listen: false)
+                  .hapusCatatan(id);
               Navigator.pop(ctx);
             },
             child: const Text('Hapus', style: TextStyle(color: Colors.white)),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
+import 'package:provider/provider.dart';
 
 import '../providers/catatan_store.dart';
 import 'profile_detail_screen.dart';
@@ -9,7 +9,6 @@ import 'schedule_screen.dart';
 import 'daftar_catatan_screen.dart';
 import 'animated_login_screen.dart';
 import 'project_portofolio_screen.dart';
-// TAMBAHAN: Import layar Pengingat Tugas
 import 'pengingat_tugas_screen.dart';
 
 class FormScreen extends StatefulWidget {
@@ -123,17 +122,24 @@ class _FormScreenState extends State<FormScreen> {
 
   void _simpanCatatan() {
     if (_formKey.currentState!.validate()) {
+      final judul = 'Sesi Kelas: ${_selectedMataKuliah ?? "Umum"}';
+      const isi = 'Ketuk untuk melengkapi ringkasan materi perkuliahan...';
+      final mataKuliah = _selectedMataKuliah ?? 'Mata Kuliah Umum';
+
       Provider.of<CatatanStore>(context, listen: false).tambahCatatan(
         CatatanModel(
-          mataKuliah: _selectedMataKuliah ?? 'Mata Kuliah Umum',
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          judul: judul,
+          isi: isi,
+          mataKuliah: mataKuliah,
           tanggal: _currentDate,
         ),
       );
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-              'Catatan berhasil ditambahkan! Buka Daftar Catatan untuk mengisi detail.'),
+          content: Text('Sesi kelas berhasil dibuat!'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -476,8 +482,9 @@ class _FormScreenState extends State<FormScreen> {
                 setState(() {
                   _currentName = result['name'] ?? '';
                   _currentNim = result['nim'] ?? '';
-                  if (result['imagePath'] != null)
+                  if (result['imagePath'] != null) {
                     _profileImagePath = result['imagePath'];
+                  }
                 });
               }
             },
@@ -526,23 +533,15 @@ class _FormScreenState extends State<FormScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const ModernLoginScreen()))),
-
-          // Menu Beranda telah dihapus sesuai permintaan
-
           HoverableSidebarItem(
             icon: Icons.task_alt,
             title: 'Pengingat Tugas',
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PengingatTugasScreen()));
-            },
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const PengingatTugasScreen())),
           ),
-
           const SizedBox(height: 16),
-
-          // Teks PRIVATE diubah menjadi AKADEMIK & MENU (Sesuai lingkaran hijau & merah)
           const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               child: Text('AKADEMIK & MENU',
@@ -550,8 +549,6 @@ class _FormScreenState extends State<FormScreen> {
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey))),
-
-          // Menu-menu dipindahkan ke bawah (Sesuai lingkaran hitam)
           HoverableSidebarItem(
               icon: Icons.list_alt,
               title: 'StudyLog',

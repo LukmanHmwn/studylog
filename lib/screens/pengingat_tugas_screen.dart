@@ -3,8 +3,138 @@ import 'package:provider/provider.dart';
 import '../providers/catatan_store.dart';
 import 'detail_catatan_screen.dart';
 
-class PengingatTugasScreen extends StatelessWidget {
+class PengingatTugasScreen extends StatefulWidget {
   const PengingatTugasScreen({super.key});
+
+  @override
+  State<PengingatTugasScreen> createState() => _PengingatTugasScreenState();
+}
+
+class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _judulController = TextEditingController();
+  final TextEditingController _deskripsiController = TextEditingController();
+
+  @override
+  void dispose() {
+    _judulController.dispose();
+    _deskripsiController.dispose();
+    super.dispose();
+  }
+
+  void _tambahTugas(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      final catatanBaru = CatatanModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        judul: _judulController.text,
+        mataKuliah: 'Umum',
+        isi: _deskripsiController.text,
+        tanggal: DateTime.now().toString(),
+        deadline: DateTime.now().add(const Duration(days: 1)),
+      );
+
+      Provider.of<CatatanStore>(context, listen: false)
+          .tambahCatatan(catatanBaru);
+
+      _judulController.clear();
+      _deskripsiController.clear();
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pengingat tugas berhasil ditambahkan!'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  void _tampilkanFormTambah(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 24,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Tambah Pengingat Tugas',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF37352F))),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _judulController,
+                  decoration: InputDecoration(
+                    labelText: 'Judul Tugas',
+                    filled: true,
+                    fillColor: const Color(0xFFF9F9F8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEAEAEA)),
+                    ),
+                  ),
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? 'Judul wajib diisi'
+                      : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _deskripsiController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Deskripsi / Detail Tugas',
+                    filled: true,
+                    fillColor: const Color(0xFFF9F9F8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFEAEAEA)),
+                    ),
+                  ),
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? 'Deskripsi wajib diisi'
+                      : null,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _tambahTugas(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2383E2),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Simpan Tugas',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,18 +144,14 @@ class PengingatTugasScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF37352F)),
-        title: const Text(
-          'Pengingat Tugas',
-          style:
-              TextStyle(color: Color(0xFF37352F), fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Pengingat Tugas',
+            style: TextStyle(
+                color: Color(0xFF37352F), fontWeight: FontWeight.bold)),
       ),
       body: Consumer<CatatanStore>(
         builder: (context, store, child) {
           final listTugas =
               store.catatanList.where((c) => c.deadline != null).toList();
-
-          listTugas.sort((a, b) => a.deadline!.compareTo(b.deadline!));
 
           if (listTugas.isEmpty) {
             return Center(
@@ -47,134 +173,54 @@ class PengingatTugasScreen extends StatelessWidget {
             itemCount: listTugas.length,
             itemBuilder: (context, index) {
               final tugas = listTugas[index];
-              return _buildTaskCard(context, tugas);
+              return Card(
+                elevation: 0,
+                margin: const EdgeInsets.only(bottom: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              DetailCatatanScreen(catatan: tugas)),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        tugas.judul.isEmpty ? 'Tugas Tanpa Judul' : tugas.judul,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Text(tugas.mataKuliah,
+                            style: const TextStyle(color: Colors.blueGrey)),
+                      ),
+                      trailing: IconButton(
+                        icon:
+                            const Icon(Icons.delete_outline, color: Colors.red),
+                        onPressed: () => store.hapusCatatan(tugas.id),
+                      ),
+                    ),
+                  ),
+                ),
+              );
             },
           );
         },
       ),
-    );
-  }
-
-  Widget _buildTaskCard(BuildContext context, CatatanModel tugas) {
-    final now = DateTime.now();
-    final deadline = tugas.deadline!;
-    final difference = deadline.difference(now);
-
-    String statusText;
-    Color statusColor;
-
-    if (difference.isNegative) {
-      statusText = 'Terlewat';
-      statusColor = Colors.redAccent;
-    } else if (difference.inDays == 0 && deadline.day == now.day) {
-      statusText = 'Hari Ini!';
-      statusColor = Colors.orange;
-    } else if (difference.inDays == 0 || difference.inDays == 1) {
-      statusText = 'Besok (H-1)';
-      statusColor = const Color(0xFF2383E2);
-    } else {
-      statusText = 'H-${difference.inDays}';
-      statusColor = Colors.green;
-    }
-
-    String jam =
-        "${deadline.hour.toString().padLeft(2, '0')}:${deadline.minute.toString().padLeft(2, '0')}";
-    String tanggal = "${deadline.day}/${deadline.month}/${deadline.year}";
-
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: InkWell(
-        // Menggunakan InkWell sebagai ganti ListTile tap agar lebih fleksibel
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DetailCatatanScreen(catatan: tugas)),
-          );
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start, // Align to top
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    shape: BoxShape.circle),
-                child: Icon(Icons.assignment_late_outlined, color: statusColor),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        tugas.judul.isEmpty ? 'Tugas Tanpa Judul' : tugas.judul,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 4),
-                    Text(tugas.mataKuliah,
-                        style: const TextStyle(color: Colors.blueGrey)),
-                    const SizedBox(height: 8),
-                    // PERBAIKAN: Menggunakan Wrap untuk elemen tanggal/jam agar tidak overflow
-                    Wrap(
-                      spacing: 12.0, // Jarak horizontal
-                      runSpacing: 4.0, // Jarak vertikal jika elemen turun baris
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.calendar_today,
-                                size: 14, color: Colors.grey.shade600),
-                            const SizedBox(width: 4),
-                            Text(tanggal,
-                                style: TextStyle(
-                                    color: Colors.grey.shade600, fontSize: 12)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.access_time,
-                                size: 14, color: Colors.grey.shade600),
-                            const SizedBox(width: 4),
-                            Text(jam,
-                                style: TextStyle(
-                                    color: Colors.grey.shade600, fontSize: 12)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Elemen Status dipisahkan agar selalu berada di kanan
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  statusText,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _tampilkanFormTambah(context),
+        backgroundColor: const Color(0xFF2383E2),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

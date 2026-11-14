@@ -187,7 +187,6 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
               ],
             ),
             const SizedBox(height: 24),
-
             if (info != null)
               Container(
                 padding: const EdgeInsets.all(20),
@@ -214,7 +213,6 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
                 ),
               ),
             const SizedBox(height: 32),
-
             const Text(
               'Judul Catatan',
               style: TextStyle(
@@ -241,8 +239,6 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // PERBAIKAN: Menggunakan Wrap agar elemen tidak menumpuk saat di HP
             InkWell(
               onTap: _aturDeadline,
               borderRadius: BorderRadius.circular(8),
@@ -260,9 +256,8 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
                           : const Color(0xFF2383E2).withOpacity(0.5)),
                 ),
                 child: Wrap(
-                  // Wrap menggantikan Row di sini
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8.0, // Jarak antar elemen secara horizontal
+                  spacing: 8.0,
                   children: [
                     Icon(Icons.alarm,
                         size: 18,
@@ -292,7 +287,6 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
             const SizedBox(height: 24),
             const Divider(color: Color(0xFFEAEAEA), thickness: 1),
             const SizedBox(height: 16),
-
             TextField(
               controller: _isiController,
               maxLines: null,
@@ -317,16 +311,15 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
 
   Widget _buildInfoRow(IconData icon, String label, String value,
       {bool isHighlight = false}) {
-    // PERBAIKAN: Mengatur lebar kolom agar lebih fleksibel di HP
     return LayoutBuilder(builder: (context, constraints) {
-      bool isMobile = constraints.maxWidth < 300; // Cek jika layar sangat kecil
+      bool isMobile = constraints.maxWidth < 300;
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 18, color: Colors.grey),
           const SizedBox(width: 12),
           SizedBox(
-            width: isMobile ? 90 : 120, // Lebar disesuaikan
+            width: isMobile ? 90 : 120,
             child: Text(label,
                 style: const TextStyle(fontSize: 13, color: Colors.grey)),
           ),

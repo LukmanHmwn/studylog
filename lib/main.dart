@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'providers/catatan_store.dart';
 import 'screens/animated_login_screen.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => CatatanStore(),
+      create: (_) => CatatanStore(),
       child: const StudyLogApp(),
     ),
   );
@@ -19,9 +18,13 @@ class StudyLogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'StudyLog',
-      theme: ThemeData(brightness: Brightness.light, useMaterial3: true),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: const Color(0xFF2383E2),
+        scaffoldBackgroundColor: const Color(0xFFFAFAFA),
+        fontFamily: 'Inter',
+      ),
       home: const ModernLoginScreen(),
     );
   }

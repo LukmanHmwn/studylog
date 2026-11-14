@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 class CatatanModel {
-  final String id;
-  String mataKuliah;
-  String tanggal;
+  String id;
   String judul;
   String isi;
-  String dosen; // Menambahkan kembali properti dosen
+  String mataKuliah;
+  String tanggal;
   DateTime? deadline;
 
   CatatanModel({
-    String? id,
+    required this.id,
+    required this.judul,
+    required this.isi,
     required this.mataKuliah,
     required this.tanggal,
-    this.judul = '',
-    this.isi = '',
-    this.dosen = '', // Default kosong
     this.deadline,
-  }) : id = id ?? const Uuid().v4();
+  });
 }
 
 class CatatanStore extends ChangeNotifier {
@@ -31,8 +28,12 @@ class CatatanStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateCatatan(String id, String judulBaru, String isiBaru,
-      {DateTime? deadlineBaru}) {
+  void updateCatatan(
+    String id,
+    String judulBaru,
+    String isiBaru, {
+    DateTime? deadlineBaru,
+  }) {
     final index = _catatanList.indexWhere((c) => c.id == id);
     if (index != -1) {
       _catatanList[index].judul = judulBaru;
