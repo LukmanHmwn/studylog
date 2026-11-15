@@ -3,11 +3,14 @@ import 'package:provider/provider.dart';
 import 'providers/catatan_store.dart';
 import 'screens/animated_login_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final catatanStore = CatatanStore();
+  await catatanStore.muatCatatan();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => CatatanStore(),
+    ChangeNotifierProvider<CatatanStore>.value(
+      value: catatanStore,
       child: const StudyLogApp(),
     ),
   );
