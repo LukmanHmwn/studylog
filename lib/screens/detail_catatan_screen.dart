@@ -16,54 +16,54 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
   late TextEditingController _isiController;
   DateTime? _selectedDeadline;
 
-  final Map<String, Map<String, String>> mataKuliahInfo = {
+  final Map<String, Map<String, String>> _detailMataKuliah = {
     'Sistem Manajemen Basis Data': {
-      'dosen': 'FAHRUL HIDAYAT S.Kom., M.Kom',
-      'jadwal': 'Senin 19.00-20.30 (LAB A)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'NASRUDDIN BIN IDRIS, S.Kom., M.Kom.',
+      'jadwal': 'Senin 19:00-20:30 (LAB B (FIKOM))',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
     'Teknologi Aplikasi Bergerak': {
-      'dosen': 'ISTIA BUDI S.Kom M.Kom',
-      'jadwal': 'Senin 20.30-22.00 (LAB A)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'ISTIA BUDI, S.T., M.M.',
+      'jadwal': 'Senin 20:30-22:00 (LAB A (FIKOM))',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
     'Penalaran Komputer': {
-      'dosen': 'SLAMET HARTONO S.Kom., M.Kom',
-      'jadwal': 'Selasa 19.00-20.30 (A201)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'ISA ROSITA, S.Kom., M.Cs.',
+      'jadwal': 'Selasa 19:00-20:30 (A201)',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
     'Simulasi dan Game Komputer': {
-      'dosen': 'ISTIA BUDI S.Kom M.Kom',
-      'jadwal': 'Rabu 20.30-22.00 (LAB A)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'HERUZULKIFLI ROWA, S.Kom, M.Kom',
+      'jadwal': 'Selasa 20:30-22:00 (LAB A (FIKOM))',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
     'Kriptografi': {
-      'dosen': 'WISNU HERA P S.TP., M.Eng',
-      'jadwal': 'Kamis 20.30-22.00 (LAB ROBOTIK)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'MUHAMMAD SAFI\'I, S.Kom., M.Kom.',
+      'jadwal': 'Rabu 20:30-22:00 (A301)',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
     'Penulisan dan Publikasi Ilmiah': {
-      'dosen': 'Prof. Dr. Ir. SULARDIONO, M.S.',
-      'jadwal': 'Jumat 20.30-22.00 (A203)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'YUSTIAN SERVANDA, S.Kom., M.Kom.',
+      'jadwal': 'Kamis 19:00-20:30 (A203)',
+      'kelas': 'IFB 5J',
+      'sks': '2 SKS',
     },
     'Jaringan Nirkabel': {
-      'dosen': 'FANNY RAMADHANI S.Kom., M.Kom',
-      'jadwal': 'Sabtu 19.00-20.30 (LAB JARINGAN)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'MARADONA, S.Kom., M.Kom.',
+      'jadwal': 'Jumat 19:00-20:30 (LAB JARINGAN (FIKOM))',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
     'Pemrograman Aplikasi Bergerak': {
-      'dosen': 'GUNAWAN S.ST., M.T',
-      'jadwal': 'Sabtu 20.30-22.00 (LAB A)',
-      'ruang': 'IFB 5J',
-      'sks': '3 SKS'
+      'dosen': 'PRAMUDYA PRIMA INSAN, S.Kom., M.Kom.',
+      'jadwal': 'Jumat 20:30-22:00 (LAB A (FIKOM))',
+      'kelas': 'IFB 5J',
+      'sks': '3 SKS',
     },
   };
 
@@ -82,277 +82,368 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
     super.dispose();
   }
 
+  Future<void> _pilihDeadline() async {
+    final initialDate =
+        _selectedDeadline ?? DateTime.now().add(const Duration(days: 1));
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (pickedDate == null || !mounted) return;
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initialDate),
+    );
+    if (pickedTime == null || !mounted) return;
+
+    setState(() {
+      _selectedDeadline = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+    });
+  }
+
   void _simpanPerubahan() {
+    final judulBaru = _judulController.text.trim();
+    final isiBaru = _isiController.text.trim();
+
     Provider.of<CatatanStore>(context, listen: false).updateCatatan(
       widget.catatan.id,
-      _judulController.text,
-      _isiController.text,
+      judulBaru.isNotEmpty ? judulBaru : widget.catatan.judul,
+      isiBaru,
       deadlineBaru: _selectedDeadline,
     );
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Catatan & Deadline berhasil disimpan!'),
-        backgroundColor: Colors.green,
+        content: Text('Catatan berhasil disimpan!'),
+        backgroundColor: Color(0xFF16A34A),
+        behavior: SnackBarBehavior.floating,
       ),
     );
     Navigator.pop(context);
   }
 
-  Future<void> _aturDeadline() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDeadline ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2030),
-    );
-
-    if (pickedDate != null) {
-      if (!mounted) return;
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: _selectedDeadline != null
-            ? TimeOfDay.fromDateTime(_selectedDeadline!)
-            : TimeOfDay.now(),
-      );
-
-      if (pickedTime != null) {
-        setState(() {
-          _selectedDeadline = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final info = mataKuliahInfo[widget.catatan.mataKuliah];
-    String deadlineText = "+ Set Tanggal & Jam Pengumpulan Tugas";
+    final infoMatkul = _detailMataKuliah[widget.catatan.mataKuliah] ??
+        {
+          'dosen': 'Dosen Pengampu',
+          'jadwal': widget.catatan.tanggal,
+          'kelas': 'IFB 5J',
+          'sks': '3 SKS',
+        };
+
+    String deadlineText = '+ Set Tanggal & Jam Pengumpulan Tugas';
     if (_selectedDeadline != null) {
       final d = _selectedDeadline!;
-      String jam =
-          "${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}";
-      deadlineText = "Tenggat: ${d.day}/${d.month}/${d.year} • Jam $jam";
+      final jam =
+          '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+      deadlineText = 'Tenggat Tugas: ${d.day}/${d.month}/${d.year} • Jam $jam';
     }
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF37352F)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1E293B)),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 12.0),
             child: TextButton.icon(
               onPressed: _simpanPerubahan,
-              icon: const Icon(Icons.save, color: Color(0xFF2383E2), size: 18),
-              label: const Text('Simpan',
-                  style: TextStyle(
-                      color: Color(0xFF2383E2), fontWeight: FontWeight.bold)),
+              icon: const Icon(
+                Icons.save_outlined,
+                color: Color(0xFF2383E2),
+                size: 19,
+              ),
+              label: const Text(
+                'Simpan',
+                style: TextStyle(
+                  color: Color(0xFF2383E2),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.apps, color: Colors.blue, size: 24),
+                // Header Ikon & Nama Mata Kuliah
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.grid_view_rounded,
+                        color: Color(0xFF38BDF8),
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        widget.catatan.mataKuliah,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    widget.catatan.mataKuliah,
+                const SizedBox(height: 18),
+
+                // Kartu Informasi Akademik Mata Kuliah
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Icon(Icons.person_outline_rounded,
+                                size: 17, color: Color(0xFF64748B)),
+                          ),
+                          const SizedBox(width: 10),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: SizedBox(
+                              width: 112,
+                              child: Text(
+                                'Dosen Pengampu',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE0F2FE),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                infoMatkul['dosen']!,
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0369A1),
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoRow(
+                        icon: Icons.access_time_rounded,
+                        label: 'Jadwal Kuliah',
+                        value: infoMatkul['jadwal']!,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoRow(
+                        icon: Icons.apartment_rounded,
+                        label: 'Ruang / Kelas',
+                        value: infoMatkul['kelas']!,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildInfoRow(
+                        icon: Icons.auto_stories_outlined,
+                        label: 'Bobot SKS',
+                        value: infoMatkul['sks']!,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 22),
+
+                // Input Judul Catatan
+                const Text(
+                  'Judul Catatan',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: TextField(
+                    controller: _judulController,
                     style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF37352F)),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF0F172A),
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Tombol Set Tenggat Tugas
+                InkWell(
+                  onTap: _pilihDeadline,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _selectedDeadline != null
+                          ? const Color(0xFFFEF2F2)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _selectedDeadline != null
+                            ? const Color(0xFFFECACA)
+                            : const Color(0xFFE2E8F0),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.alarm_add_rounded,
+                          size: 18,
+                          color: _selectedDeadline != null
+                              ? const Color(0xFFDC2626)
+                              : const Color(0xFF64748B),
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            deadlineText,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _selectedDeadline != null
+                                  ? const Color(0xFFDC2626)
+                                  : const Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+                        if (_selectedDeadline != null) ...[
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () =>
+                                setState(() => _selectedDeadline = null),
+                            child: const Icon(Icons.close_rounded,
+                                size: 16, color: Color(0xFFDC2626)),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                const SizedBox(height: 14),
+
+                // Area Teks Ringkasan Materi
+                TextField(
+                  controller: _isiController,
+                  maxLines: null,
+                  minLines: 8,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF1E293B),
+                    height: 1.6,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText:
+                        'Ketuk untuk melengkapi ringkasan materi perkuliahan...',
+                    hintStyle: TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 15,
+                    ),
+                    border: InputBorder.none,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            if (info != null)
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9F9F8),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFEAEAEA)),
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow(Icons.person_outline, 'Dosen Pengampu',
-                        info['dosen'] ?? '-',
-                        isHighlight: true),
-                    const SizedBox(height: 16),
-                    _buildInfoRow(Icons.access_time, 'Jadwal Kuliah',
-                        info['jadwal'] ?? '-'),
-                    const SizedBox(height: 16),
-                    _buildInfoRow(Icons.meeting_room_outlined, 'Ruang / Kelas',
-                        info['ruang'] ?? '-'),
-                    const SizedBox(height: 16),
-                    _buildInfoRow(Icons.menu_book_outlined, 'Bobot SKS',
-                        info['sks'] ?? '-'),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 32),
-            const Text(
-              'Judul Catatan',
-              style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9F9F8),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                controller: _judulController,
-                style: const TextStyle(fontSize: 15, color: Color(0xFF37352F)),
-                decoration: const InputDecoration(
-                  hintText: 'Masukkan judul untuk membedakan catatan ini...',
-                  hintStyle: TextStyle(color: Color(0xFFD4D4D4), fontSize: 15),
-                  border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            InkWell(
-              onTap: _aturDeadline,
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: _selectedDeadline == null
-                      ? const Color(0xFFF9F9F8)
-                      : const Color(0xFF2383E2).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                      color: _selectedDeadline == null
-                          ? const Color(0xFFEAEAEA)
-                          : const Color(0xFF2383E2).withOpacity(0.5)),
-                ),
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8.0,
-                  children: [
-                    Icon(Icons.alarm,
-                        size: 18,
-                        color: _selectedDeadline == null
-                            ? const Color(0xFF91918E)
-                            : const Color(0xFF2383E2)),
-                    Text(
-                      deadlineText,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: _selectedDeadline == null
-                            ? const Color(0xFF91918E)
-                            : const Color(0xFF2383E2),
-                      ),
-                    ),
-                    if (_selectedDeadline != null)
-                      GestureDetector(
-                        onTap: () => setState(() => _selectedDeadline = null),
-                        child: const Icon(Icons.close,
-                            size: 16, color: Colors.redAccent),
-                      )
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Divider(color: Color(0xFFEAEAEA), thickness: 1),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _isiController,
-              maxLines: null,
-              style: const TextStyle(
-                  fontSize: 15, color: Color(0xFF37352F), height: 1.6),
-              decoration: const InputDecoration(
-                hintText:
-                    'Tuangkan ringkasan materi, ide tugas, atau coretan brilianmu di sini...\nKetik apapun yang ingin kamu ingat hari ini!',
-                hintStyle: TextStyle(
-                    color: Color(0xFFD4D4D4),
-                    fontStyle: FontStyle.italic,
-                    height: 1.6),
-                border: InputBorder.none,
-              ),
-            ),
-            const SizedBox(height: 40),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value,
-      {bool isHighlight = false}) {
-    return LayoutBuilder(builder: (context, constraints) {
-      bool isMobile = constraints.maxWidth < 300;
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 18, color: Colors.grey),
-          const SizedBox(width: 12),
-          SizedBox(
-            width: isMobile ? 90 : 120,
-            child: Text(label,
-                style: const TextStyle(fontSize: 13, color: Colors.grey)),
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 17, color: const Color(0xFF64748B)),
+        const SizedBox(width: 10),
+        SizedBox(
+          width: 112,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12.5,
+              color: Color(0xFF64748B),
+            ),
           ),
-          Expanded(
-            child: isHighlight
-                ? Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE3F2FD),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        value,
-                        style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1565C0)),
-                      ),
-                    ),
-                  )
-                : Text(
-                    value,
-                    style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF37352F)),
-                  ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF0F172A),
+            ),
           ),
-        ],
-      );
-    });
+        ),
+      ],
+    );
   }
 }

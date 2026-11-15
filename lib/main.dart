@@ -4,6 +4,7 @@ import 'providers/catatan_store.dart';
 import 'screens/animated_login_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     ChangeNotifierProvider(
       create: (_) => CatatanStore(),

@@ -7,6 +7,7 @@ class CatatanModel {
   String mataKuliah;
   String tanggal;
   DateTime? deadline;
+  bool isSelesai;
 
   CatatanModel({
     required this.id,
@@ -15,6 +16,7 @@ class CatatanModel {
     required this.mataKuliah,
     required this.tanggal,
     this.deadline,
+    this.isSelesai = false,
   });
 }
 
@@ -39,6 +41,14 @@ class CatatanStore extends ChangeNotifier {
       _catatanList[index].judul = judulBaru;
       _catatanList[index].isi = isiBaru;
       _catatanList[index].deadline = deadlineBaru;
+      notifyListeners();
+    }
+  }
+
+  void toggleSelesai(String id) {
+    final index = _catatanList.indexWhere((c) => c.id == id);
+    if (index != -1) {
+      _catatanList[index].isSelesai = !_catatanList[index].isSelesai;
       notifyListeners();
     }
   }
