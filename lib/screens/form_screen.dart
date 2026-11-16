@@ -462,115 +462,125 @@ class _FormScreenState extends State<FormScreen> {
   Widget _buildSidebar(BuildContext context) {
     return Container(
       width: 260,
+      height: double.infinity,
       color: const Color(0xFFF7F7F5),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-              padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
-              child: AnimatedHeaderTitle()),
-          InkWell(
-            onTap: () async {
-              final result = await Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                      pageBuilder: (context, a, b) => ProfileDetailScreen(
-                          initialName: _currentName,
-                          initialNim: _currentNim,
-                          initialImagePath: _profileImagePath)));
-              if (result != null && result is Map<String, dynamic>) {
-                setState(() {
-                  _currentName = result['name'] ?? '';
-                  _currentNim = result['nim'] ?? '';
-                  if (result['imagePath'] != null) {
-                    _profileImagePath = result['imagePath'];
-                  }
-                });
-              }
-            },
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: Row(
-                children: [
-                  _buildProfileAvatar(),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            _currentName.isEmpty
-                                ? "Belum ada nama"
-                                : _currentName,
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: _currentName.isEmpty
-                                    ? Colors.grey
-                                    : const Color(0xFF37352F)),
-                            overflow: TextOverflow.ellipsis),
-                        Text(
-                            _currentNim.isEmpty
-                                ? "NIM: -"
-                                : "NIM: $_currentNim",
-                            style: const TextStyle(
-                                fontSize: 11, color: Color(0xFF757575))),
-                      ],
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+                padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+                child: AnimatedHeaderTitle()),
+            InkWell(
+              onTap: () async {
+                final result = await Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                        pageBuilder: (context, a, b) => ProfileDetailScreen(
+                            initialName: _currentName,
+                            initialNim: _currentNim,
+                            initialImagePath: _profileImagePath)));
+                if (result != null && result is Map<String, dynamic>) {
+                  setState(() {
+                    _currentName = result['name'] ?? '';
+                    _currentNim = result['nim'] ?? '';
+                    if (result['imagePath'] != null) {
+                      _profileImagePath = result['imagePath'];
+                    }
+                  });
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                child: Row(
+                  children: [
+                    _buildProfileAvatar(),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              _currentName.isEmpty
+                                  ? "Belum ada nama"
+                                  : _currentName,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: _currentName.isEmpty
+                                      ? Colors.grey
+                                      : const Color(0xFF37352F)),
+                              overflow: TextOverflow.ellipsis),
+                          Text(
+                              _currentNim.isEmpty
+                                  ? "NIM: -"
+                                  : "NIM: $_currentNim",
+                              style: const TextStyle(
+                                  fontSize: 11, color: Color(0xFF757575))),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
-                ],
+                    const Icon(Icons.chevron_right,
+                        size: 18, color: Colors.grey),
+                  ],
+                ),
               ),
             ),
-          ),
-          const Divider(height: 1, color: Color(0xFFE0E0DE)),
-          const SizedBox(height: 16),
-          HoverableSidebarItem(
-              icon: Icons.logout,
-              title: 'Kembali ke Login',
-              onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ModernLoginScreen()))),
-          HoverableSidebarItem(
-            icon: Icons.task_alt,
-            title: 'Pengingat Tugas',
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const PengingatTugasScreen())),
-          ),
-          const SizedBox(height: 16),
-          const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-              child: Text('AKADEMIK & MENU',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey))),
-          HoverableSidebarItem(
-              icon: Icons.list_alt,
-              title: 'StudyLog',
+            const Divider(height: 1, color: Color(0xFFE0E0DE)),
+            const SizedBox(height: 16),
+            HoverableSidebarItem(
+              icon: Icons.task_alt,
+              title: 'Pengingat Tugas',
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const DaftarCatatanScreen()))),
-          HoverableSidebarItem(
-              icon: Icons.school_outlined,
-              title: 'Jadwal Kuliah',
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ScheduleScreen()))),
-          HoverableSidebarItem(
-              icon: Icons.code,
-              title: 'Project Portofolio',
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ProjectPortofolioScreen()))),
-        ],
+                      builder: (context) => const PengingatTugasScreen())),
+            ),
+            const SizedBox(height: 16),
+            const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                child: Text('AKADEMIK & MENU',
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey))),
+            HoverableSidebarItem(
+                icon: Icons.list_alt,
+                title: 'StudyLog',
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DaftarCatatanScreen()))),
+            HoverableSidebarItem(
+                icon: Icons.school_outlined,
+                title: 'Jadwal Kuliah',
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ScheduleScreen()))),
+            HoverableSidebarItem(
+                icon: Icons.code,
+                title: 'Project Portofolio',
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const ProjectPortofolioScreen()))),
+            const Spacer(),
+            const Divider(height: 1, color: Color(0xFFE0E0DE)),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: HoverableSidebarItem(
+                  icon: Icons.logout,
+                  title: 'Kembali ke Login',
+                  onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ModernLoginScreen()))),
+            ),
+          ],
+        ),
       ),
     );
   }
