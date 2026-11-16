@@ -71,7 +71,12 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
   void initState() {
     super.initState();
     _judulController = TextEditingController(text: widget.catatan.judul);
-    _isiController = TextEditingController(text: widget.catatan.isi);
+    const legacyPlaceholder =
+        'Ketuk untuk melengkapi ringkasan materi perkuliahan...';
+    final initialIsi = widget.catatan.isi.trim() == legacyPlaceholder
+        ? ''
+        : widget.catatan.isi;
+    _isiController = TextEditingController(text: initialIsi);
     _selectedDeadline = widget.catatan.deadline;
   }
 

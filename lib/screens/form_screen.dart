@@ -123,7 +123,7 @@ class _FormScreenState extends State<FormScreen> {
   void _simpanCatatan() {
     if (_formKey.currentState!.validate()) {
       final judul = 'Sesi Kelas: ${_selectedMataKuliah ?? "Umum"}';
-      const isi = 'Ketuk untuk melengkapi ringkasan materi perkuliahan...';
+      const isi = '';
       final mataKuliah = _selectedMataKuliah ?? 'Mata Kuliah Umum';
 
       Provider.of<CatatanStore>(context, listen: false).tambahCatatan(
