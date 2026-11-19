@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 
 import '../providers/catatan_store.dart';
+import 'dashboard_screen.dart';
 import 'profile_detail_screen.dart';
 import 'schedule_screen.dart';
 import 'daftar_catatan_screen.dart';
@@ -529,6 +530,20 @@ class _FormScreenState extends State<FormScreen> {
             ),
             const Divider(height: 1, color: Color(0xFFE0E0DE)),
             const SizedBox(height: 16),
+            HoverableSidebarItem(
+              icon: Icons.dashboard_rounded,
+              title: 'Dashboard',
+              onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DashboardScreen())),
+            ),
+            HoverableSidebarItem(
+              icon: Icons.add_task_rounded,
+              title: 'Buat Sesi Kelas',
+              isSelected: true,
+              onTap: () {},
+            ),
             HoverableSidebarItem(
               icon: Icons.task_alt,
               title: 'Pengingat Tugas',

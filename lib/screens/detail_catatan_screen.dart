@@ -136,6 +136,21 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
     Navigator.pop(context);
   }
 
+  void _bukaModalShare() {
+    final catatanTerkini = CatatanModel(
+      id: widget.catatan.id,
+      judul: _judulController.text.trim().isNotEmpty
+          ? _judulController.text.trim()
+          : widget.catatan.judul,
+      isi: _isiController.text.trim(),
+      mataKuliah: widget.catatan.mataKuliah,
+      tanggal: widget.catatan.tanggal,
+      deadline: _selectedDeadline,
+      isSelesai: widget.catatan.isSelesai,
+    );
+    showNotionShareDialog(context, catatanTerkini);
+  }
+
   @override
   Widget build(BuildContext context) {
     final infoMatkul = _detailMataKuliah[widget.catatan.mataKuliah] ??
@@ -165,6 +180,30 @@ class _DetailCatatanScreenState extends State<DetailCatatanScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          OutlinedButton.icon(
+            onPressed: _bukaModalShare,
+            icon: const Icon(
+              Icons.ios_share_rounded,
+              size: 16,
+              color: Color(0xFF0F172A),
+            ),
+            label: const Text(
+              'Share',
+              style: TextStyle(
+                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFE2E8F0)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: TextButton.icon(

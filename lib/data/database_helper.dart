@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../providers/catatan_store.dart';
@@ -38,12 +39,14 @@ class DatabaseHelper {
   }
 
   Future<List<CatatanModel>> getAllCatatan() async {
+    if (kIsWeb) return [];
     final db = await database;
     final maps = await db.query('catatan');
     return maps.map((map) => CatatanModel.fromMap(map)).toList();
   }
 
   Future<int> insertCatatan(CatatanModel catatan) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.insert(
       'catatan',
@@ -53,6 +56,7 @@ class DatabaseHelper {
   }
 
   Future<int> updateCatatan(CatatanModel catatan) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.update(
       'catatan',
@@ -63,6 +67,7 @@ class DatabaseHelper {
   }
 
   Future<int> deleteCatatan(String id) async {
+    if (kIsWeb) return 0;
     final db = await database;
     return await db.delete(
       'catatan',

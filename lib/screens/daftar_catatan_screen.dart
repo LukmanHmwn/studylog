@@ -153,10 +153,32 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
           ],
         ),
         actions: [
+          OutlinedButton.icon(
+            onPressed: () => showNotionImportDialog(context),
+            icon: const Icon(Icons.download_rounded,
+                size: 16, color: Color(0xFF2383E2)),
+            label: Text(
+              isMobile ? 'Impor' : 'Impor Teman',
+              style: const TextStyle(
+                color: Color(0xFF2383E2),
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFBFDBFE)),
+              backgroundColor: const Color(0xFFEFF6FF),
+              padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 10 : 12, vertical: 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
           Consumer<CatatanStore>(
             builder: (context, store, _) {
               return Container(
-                margin: EdgeInsets.only(right: isMobile ? 12 : 16, left: 6),
+                margin: EdgeInsets.only(right: isMobile ? 12 : 16, left: 8),
                 padding: EdgeInsets.symmetric(
                     horizontal: isMobile ? 10 : 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -353,6 +375,8 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
                                       isGridCard: false,
                                       onOpen: () =>
                                           _bukaCatatan(context, catatan),
+                                      onShare: () => showNotionShareDialog(
+                                          context, catatan),
                                       onDelete: () =>
                                           _konfirmasiHapus(context, catatan.id),
                                     ),
@@ -379,6 +403,8 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
                                     isGridCard: true,
                                     onOpen: () =>
                                         _bukaCatatan(context, catatan),
+                                    onShare: () =>
+                                        showNotionShareDialog(context, catatan),
                                     onDelete: () =>
                                         _konfirmasiHapus(context, catatan.id),
                                   );
@@ -453,7 +479,7 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
               const SizedBox(height: 8),
               Text(
                 isCompletelyEmpty
-                    ? 'Buat sesi kelas baru dari halaman utama untuk mulai mencatat materi perkuliahan.'
+                    ? 'Buat sesi kelas baru atau impor catatan yang dibagikan temanmu.'
                     : 'Coba gunakan kata kunci pencarian lain atau ubah filter mata kuliah.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -464,33 +490,57 @@ class _DaftarCatatanScreenState extends State<DaftarCatatanScreen> {
               ),
               if (isCompletelyEmpty) ...[
                 const SizedBox(height: 22),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const FormScreen()),
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.add_rounded, size: 18),
-                  label: const Text(
-                    'Buat Sesi Kelas',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2383E2),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const FormScreen()),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: const Text(
+                        'Buat Sesi Kelas',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2383E2),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
-                  ),
+                    OutlinedButton.icon(
+                      onPressed: () => showNotionImportDialog(context),
+                      icon: const Icon(Icons.download_rounded, size: 18),
+                      label: const Text(
+                        'Impor Teman',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF2383E2),
+                        side: const BorderSide(color: Color(0xFFBFDBFE)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
@@ -557,6 +607,7 @@ class _ModernCatatanCard extends StatefulWidget {
   final Map<String, dynamic> styleInfo;
   final bool isGridCard;
   final VoidCallback onOpen;
+  final VoidCallback onShare;
   final VoidCallback onDelete;
 
   const _ModernCatatanCard({
@@ -564,6 +615,7 @@ class _ModernCatatanCard extends StatefulWidget {
     required this.styleInfo,
     required this.isGridCard,
     required this.onOpen,
+    required this.onShare,
     required this.onDelete,
   });
 
@@ -813,15 +865,30 @@ class _ModernCatatanCardState extends State<_ModernCatatanCard> {
                             ),
                           ),
                         ),
-                        IconButton(
-                          onPressed: widget.onDelete,
-                          tooltip: 'Hapus Catatan',
-                          icon: const Icon(
-                            Icons.delete_outline_rounded,
-                            color: Colors.redAccent,
-                            size: 19,
-                          ),
-                          visualDensity: VisualDensity.compact,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: widget.onShare,
+                              tooltip: 'Bagikan Catatan',
+                              icon: const Icon(
+                                Icons.ios_share_rounded,
+                                color: Color(0xFF2383E2),
+                                size: 18,
+                              ),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            IconButton(
+                              onPressed: widget.onDelete,
+                              tooltip: 'Hapus Catatan',
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.redAccent,
+                                size: 19,
+                              ),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ],
                         ),
                       ],
                     ),

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +8,20 @@ import 'screens/animated_login_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux ||
+          defaultTargetPlatform == TargetPlatform.macOS)) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
 
   final catatanStore = CatatanStore();
-  await catatanStore.muatCatatan();
+  try {
+    await catatanStore.muatCatatan();
+  } catch (e) {
+    debugPrint('Inisialisasi catatan awal dilewati: $e');
+  }
 
   runApp(
     ChangeNotifierProvider<CatatanStore>.value(

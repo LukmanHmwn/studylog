@@ -69,12 +69,10 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
   @override
   void initState() {
     super.initState();
-    // Pembaruan otomatis setiap 30 detik agar status melewati batas waktu selalu akurat
     _clockTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       if (mounted) setState(() {});
     });
 
-    // Tampilkan notifikasi pengingat otomatis saat layar dibuka jika ada tugas belum selesai
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final store = Provider.of<CatatanStore>(context, listen: false);
@@ -247,7 +245,7 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
                           ),
                           const SizedBox(height: 20),
                           DropdownButtonFormField<String>(
-                            value: selectedMatkul,
+                            initialValue: selectedMatkul,
                             isExpanded: true,
                             decoration: InputDecoration(
                               labelText: 'Mata Kuliah',
@@ -342,8 +340,9 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
                                 firstDate: DateTime(2020),
                                 lastDate: DateTime(2030),
                               );
-                              if (pickedDate == null || !context.mounted)
+                              if (pickedDate == null || !context.mounted) {
                                 return;
+                              }
 
                               final pickedTime = await showTimePicker(
                                 context: context,
@@ -556,13 +555,35 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
           ],
         ),
         actions: [
+          OutlinedButton.icon(
+            onPressed: () => showNotionImportDialog(context, khususTugas: true),
+            icon: const Icon(Icons.download_rounded,
+                size: 16, color: Color(0xFF2383E2)),
+            label: Text(
+              isMobile ? 'Impor' : 'Impor Tugas',
+              style: const TextStyle(
+                color: Color(0xFF2383E2),
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFBFDBFE)),
+              backgroundColor: const Color(0xFFEFF6FF),
+              padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 10 : 12, vertical: 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
           Consumer<CatatanStore>(
             builder: (context, store, _) {
               final belumSelesai = store.catatanList
                   .where((c) => c.deadline != null && !c.isSelesai)
                   .length;
               return Container(
-                margin: EdgeInsets.only(right: isMobile ? 12 : 16, left: 6),
+                margin: EdgeInsets.only(right: isMobile ? 12 : 16, left: 8),
                 padding: EdgeInsets.symmetric(
                     horizontal: isMobile ? 10 : 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -649,7 +670,6 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Banner Notifikasi Pengingat Tugas yang Belum Selesai / Melewati Batas
                   if (belumSelesaiList.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.fromLTRB(
@@ -671,8 +691,6 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
                         },
                       ),
                     ),
-
-                  // Ringkasan Statistik & Filter Chip
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       isMobile ? 16 : 28,
@@ -761,8 +779,6 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
                       ],
                     ),
                   ),
-
-                  // Daftar Kartu Tugas (Grid di Web/Tablet, List di HP)
                   Expanded(
                     child: filteredTugas.isEmpty
                         ? _buildEmptyState(semuaTugas.isEmpty)
@@ -783,6 +799,8 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
                                       isGridCard: false,
                                       onToggleSelesai: () =>
                                           _handleToggleSelesai(store, tugas),
+                                      onShare: () =>
+                                          showNotionShareDialog(context, tugas),
                                       onOpenDetail: () =>
                                           _bukaDetail(context, tugas),
                                       onDelete: () =>
@@ -811,6 +829,8 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
                                     isGridCard: true,
                                     onToggleSelesai: () =>
                                         _handleToggleSelesai(store, tugas),
+                                    onShare: () =>
+                                        showNotionShareDialog(context, tugas),
                                     onOpenDetail: () =>
                                         _bukaDetail(context, tugas),
                                     onDelete: () =>
@@ -1059,7 +1079,7 @@ class _PengingatTugasScreenState extends State<PengingatTugasScreen> {
               const SizedBox(height: 8),
               Text(
                 isCompletelyEmpty
-                    ? 'Tekan tombol "+ Tambah Tugas" di kanan bawah untuk membuat pengingat deadline baru.'
+                    ? 'Tekan "+ Tambah Tugas" atau "Impor Tugas" dari teman untuk menambahkan deadline baru.'
                     : 'Pilih tab filter "Semua" untuk melihat seluruh daftar pengingat tugasmu.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -1132,6 +1152,7 @@ class _ModernTugasCard extends StatefulWidget {
   final Map<String, dynamic> styleInfo;
   final bool isGridCard;
   final VoidCallback onToggleSelesai;
+  final VoidCallback onShare;
   final VoidCallback onOpenDetail;
   final VoidCallback onDelete;
 
@@ -1140,6 +1161,7 @@ class _ModernTugasCard extends StatefulWidget {
     required this.styleInfo,
     required this.isGridCard,
     required this.onToggleSelesai,
+    required this.onShare,
     required this.onOpenDetail,
     required this.onDelete,
   });
@@ -1530,7 +1552,17 @@ class _ModernTugasCardState extends State<_ModernTugasCard> {
                               ),
                             ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      onPressed: widget.onShare,
+                      tooltip: 'Bagikan Tugas',
+                      icon: const Icon(
+                        Icons.ios_share_rounded,
+                        color: Color(0xFF2383E2),
+                        size: 18,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                    ),
                     IconButton(
                       onPressed: widget.onOpenDetail,
                       tooltip: 'Buka Detail Catatan',

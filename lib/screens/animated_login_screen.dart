@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'form_screen.dart';
+import 'dashboard_screen.dart';
 
 class ModernLoginScreen extends StatefulWidget {
   const ModernLoginScreen({super.key});
@@ -75,7 +75,11 @@ class _ModernLoginScreenState extends State<ModernLoginScreen>
       });
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const FormScreen()),
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(
+            initialIdentifier: _identifierController.text.trim(),
+          ),
+        ),
       );
     });
   }
